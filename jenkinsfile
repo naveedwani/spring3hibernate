@@ -1,0 +1,68 @@
+pipeline {
+    agent any
+
+    stages {
+      
+        stage ('clone') {
+            steps{
+         checkout([$class: 'GitSCM', branches: [[name: '*/ninja']], extensions: [], userRemoteConfigs: 
+         [[url: 'https://github.com/opstree/spring3hibernate.git']]])
+            }
+        }
+        
+        stage('Build') {
+        steps {
+         sh '''mvn validate'''
+          }
+          }
+          
+         stage('Stability') {
+          steps {
+         sh '''mvn compile'''
+         sh '''mvn pmd:pmd'''
+          }
+          }
+          
+          stage('Quality') {
+          steps {
+           sh '''mvn checkstyle:checkstyle'''
+         
+          }
+          }
+          
+          stage('Code Coverage') {
+          steps {
+            sh '''mvn cobertura:cobertura'''
+         
+          }
+          }
+          
+          stage('Code Coverage') {
+          steps {
+            sh 'mvn install'
+            archiveArtifacts artifacts: 'target/*.war', followSymlinks: false
+         
+          }
+          }
+          
+          stage('Email') {
+         steps {
+          emailext body: '', subject: 'Build Fail', to: 'waninaveed01@gmail.com'
+       }
+          }
+          
+          stage('Quality report') {
+           steps {
+           recordIssues(tools: [checkStyle()])
+           recordIssues(tools: [findBugs(useRankAsPriority: true)])
+       }
+      }
+      
+      stage('Coverage Report') {
+       steps {
+       publishCoverage adapters: [coberturaAdapter('')], sourceFileResolver: sourceFiles('NEVER_STORE')
+     }
+     }
+
+    }
+}
