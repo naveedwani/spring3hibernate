@@ -1,6 +1,8 @@
     def call(String repoUrl) {
         
-         println(repoUrl)
+        echo "${repoUrl}"
+        
+         //println(repoUrl)
         
         pipeline {
             agent any
