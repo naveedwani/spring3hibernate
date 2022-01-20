@@ -1,5 +1,7 @@
     def call(String repoUrl) {
         
+         println(repoUrl)
+        
         pipeline {
             agent any
 
