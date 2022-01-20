@@ -1,4 +1,6 @@
-def call(String repoUrl) {
+def call(repoUrl) {
+  
+  echo "  ${repoUrl} how r u "
   pipeline {
        agent any
        tools {
